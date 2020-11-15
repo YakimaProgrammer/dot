@@ -8,7 +8,6 @@ if (window.innerWidth === 0) {
   window.innerHeight = parent.innerHeight;
 }
 
-
 var THREE = THREE || { REVISION: '52' };
 
 self.console = self.console || {

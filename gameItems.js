@@ -1,18 +1,3 @@
-// This is where stuff in our game will happen:
-var scene = new THREE.Scene();
-
-// This is what sees the stuff:
-var aspect_ratio = window.innerWidth / window.innerHeight;
-var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-camera.position.z = 500;
-scene.add(camera);
-
-// This will draw what the camera sees onto the screen:
-var renderer = new THREE.CanvasRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// ******** START CODING ON THE NEXT LINE ********
 const SIZE = 25;
 const colors = {
   RED : 0xe60b0b,
@@ -23,12 +8,6 @@ const colors = {
   BLUE : 0x0335ff,
   BLACK : 0x000000
 };
-
-var settings = {
-  CUBESCALEDOWN : 2
-  
-}
-
 
 function newMagnet() {
   var shape, cover, origin, sidePillar, sign;

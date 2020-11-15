@@ -33,13 +33,13 @@ const settings = {
 		[tileStates.MAGNET] : 5,
 		[tileStates.SCRABBLER] : 7,
 		[tileStates.PHAZER] : 9,
-	}
+	},
 	
 	DENSITY : {
 		[tileStates.WALL] : 0.15,
 		[tileStates.COIN] : 0.1,
 		[tileStates.HEART] : 0.1, 
-	}
+	},
 	
     CUBESCALEDOWN : 2,
 }
@@ -87,7 +87,7 @@ class map {
 		
 		//First, generate all game items
 		
-		for (var gameItem of settings.DENSITY) {
+		for (var gameItem in settings.DENSITY) {
 			if (settings.MINLEVEL[gameItem] >= currentLevel.level) {
 				for (var i = 0; i++; i < this.getItemDensity(gameItem)) {
 					var x, y = this.getRandomAvailablePoint();
@@ -103,8 +103,10 @@ class map {
 			playerX, playerY = this.getRandomAvailablePoint();
 			hunterX, hunterY = this.getRandomAvailablePoint();
 			
-			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2)) < 5) {
+			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2) < 5) {
 				continue; //force next loop now
+			} else {
+				break;
 			}
 			
 			
