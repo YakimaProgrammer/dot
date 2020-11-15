@@ -4,7 +4,7 @@ var scene = new THREE.Scene();
 // This is what sees the stuff:
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-camera.position.z = 500;
+camera.position.set(window.innerWidth / 2, window.innerHeight / 2,  500);
 scene.add(camera);
 
 // This will draw what the camera sees onto the screen:

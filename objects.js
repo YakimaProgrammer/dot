@@ -26,12 +26,12 @@ const settings = {
 	},
 	
 	DENSITY : {
-		WALL : 0.15,
-		COIN : 0.1,
-		HEART : 0.1, 
-		MAGNET : 0.005,
-		SCRABBLER : 0.005,
-		PHASER : 0.005,
+		WALL : 0.1,
+		COIN : 0.01,
+		HEART : 0.01, 
+		MAGNET : 0.0005,
+		SCRABBLER : 0.0005,
+		PHASER : 0.0005,
 	},
 	
     CUBESCALEDOWN : 2,
