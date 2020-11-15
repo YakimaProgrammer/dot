@@ -1,4 +1,5 @@
 const SIZE = 25;
+
 const colors = {
   RED : 0xe60b0b,
   GRAY : 0x695c5c,
@@ -223,7 +224,7 @@ function newScrabbler() {
 
 function newHeart() {
   var origin, shape, cover, sidePillar, signX;
-  var size = SIZE / 3;
+  var size = SIZE / 3.25;
   origin = new THREE.Object3D();
   
   shape = new THREE.CubeGeometry(size,size*7,size);

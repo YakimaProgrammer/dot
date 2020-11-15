@@ -1,14 +1,4 @@
-/*
-grid = new PF.Grid(3,3, [
-    [0,0,0],
-    [0,1,0],
-    [1,0,0]
-    ]);
-
-var finder = new PF.AStarFinder();
-var path = finder.findPath(0, 0, 2, 2, grid);
-*/
-
+//this file should have no notion of what a Three.js object is, just the constants I use to represent it
 
 //Define a whole bunch of tile states so I don't get confused by magic constants
 const tileStates = {
@@ -27,21 +17,25 @@ const settings = {
 	INCREASEBY : 1.3,
 	
 	MINLEVEL : {
-		[tileStates.WALL] : 0,
-		[tileStates.COIN] : 0,
-		[tileStates.HEART] : 3,
-		[tileStates.MAGNET] : 5,
-		[tileStates.SCRABBLER] : 7,
-		[tileStates.PHAZER] : 9,
+		WALL : 0,
+		COIN : 0,
+		HEART : 3,
+		MAGNET : 5,
+		SCRABBLER : 7,
+		PHAZER : 9,
 	},
 	
 	DENSITY : {
-		[tileStates.WALL] : 0.15,
-		[tileStates.COIN] : 0.1,
-		[tileStates.HEART] : 0.1, 
+		WALL : 0.15,
+		COIN : 0.1,
+		HEART : 0.1, 
+		MAGNET : 0.005,
+		SCRABBLER : 0.005,
+		PHAZER : 0.005,
 	},
 	
     CUBESCALEDOWN : 2,
+	TILEWIDTH : 16,
 }
 
 var currentLevel = {
@@ -56,7 +50,7 @@ Object.freeze(settings);
 
 function twoDarray(x, y, fill) {
 	var dx = new Array(x).fill(fill);
-	for (var i = 0; i < y; i++) {
+	for (var i = 0; i < x; i++) {
 		dx[i] = new Array(y).fill(fill);
 	}
 	return dx;
@@ -74,46 +68,69 @@ class tileObject {
 	}
 }
 
+var finder = new PF.AStarFinder();
+
 class map {
-	constructor(widthX, heightY) {
-		currentLevel.MAP = this;
+	constructor() {
+		//console.log(innerWidth, document.body.clientWidth, innerHeight);
+		this.widthX = Math.floor(innerWidth / settings.TILEWIDTH);
+		this.heightY = Math.floor(innerHeight / settings.TILEWIDTH);
 		
-		this.widthX = widthX;
-		this.heightY = heightY;
+		this.tiles = twoDarray(this.widthX, this.heightY, tileStates.EMPTY);
 		
-		this.tiles = twoDarray(widthX, heightY, tileStates.EMPTY);
-		
-		this.numTiles = widthX * heightY;
+		this.numTiles = this.widthX * this.heightY;
 		
 		//First, generate all game items
 		
 		for (var gameItem in settings.DENSITY) {
 			if (settings.MINLEVEL[gameItem] >= currentLevel.level) {
-				for (var i = 0; i++; i < this.getItemDensity(gameItem)) {
-					var x, y = this.getRandomAvailablePoint();
-					this.tiles[x][y] = gameItem;
+				for (var i = 0; i < this.getItemDensity(gameItem); i++) {
+					var [x, y] = this.getRandomAvailablePoint();
+					this.tiles[x][y] = tileStates[gameItem];
 				}
 			}
 		}
 		
-		var playerX, playerY, hunterX, hunterY;
+		var playerX, playerY, hunterX, hunterY, levelUpX, levelUpY;
 		var stillSpawning = true;
 		
 		while (stillSpawning) {
-			playerX, playerY = this.getRandomAvailablePoint();
-			hunterX, hunterY = this.getRandomAvailablePoint();
+			[playerX, playerY] = this.getRandomAvailablePoint();
+			[hunterX, hunterY] = this.getRandomAvailablePoint();
+			[levelUpX, levelUpY] = this.getRandomAvailablePoint();
 			
+			//Double check that the player and the hunter are not too close
 			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2) < 5) {
 				continue; //force next loop now
-			} else {
-				break;
+			} 
+			
+			//Now make sure that they can reach each other
+			if (!this.getPath(playerX, playerY, hunterX, hunterY)) {
+				continue;
 			}
 			
+			//and that the player can level up
+			if (!this.getPath(playerX, playerY, levelUpX, levelUpY)) {
+				continue;
+			}
 			
-			
+			stillSpawning = false;
 		}
+
+		this.asArray = this.tiles.map(function(secondaryArray) {
+			return secondaryArray.map(function(item) {
+				return item == tileStates.WALL ? 1 : 0;
+			});
+		});
 		
-		//Now, check that I can access the level up, and that the HUNTER can access me
+		this.playerX = playerX;
+		this.playerY = playerY;
+		this.hunterX = hunterX;
+		this.hunterY = hunterY;
+		this.levelUpX = levelUpX;
+		this.levelUpY = levelUpY;
+		
+		currentLevel.MAP = this;
 		
 		
 	}
@@ -132,6 +149,23 @@ class map {
 			}
 		}
 	}
+	
+	getPath(x1,y1,x2,y2) {
+		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.widthX, this.heightY, this.asArray));
+	}
+	
+	tileToCoords(x,y) {
+		return [
+		x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
+		y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
+		]
+	}
+	coordsToTile(x,y) {
+		return [
+		Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
+		Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
+		]
+	}
 }
 
-currentLevel.MAP = new map(50,60)
+new map();
