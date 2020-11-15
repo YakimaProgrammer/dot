@@ -15,23 +15,23 @@ document.body.appendChild(renderer.domElement);
 document.body.style.overflow = "hidden"; //I don't love this solution, but I can't get my computer to stop reading the total screen width/height instead of the actual width/height
 
 // ******** START CODING ON THE NEXT LINE ********
-//this is just me flexing
-var shapes = [newCoin(), newCoinMagnet(),newSpeedBoost(),newLevelUp(),newPhase(),newScrabbler(),newHeart()];
-shapes.forEach(function(item,index) {
-  scene.add(item);
-  item.position.set((index-3) * 150,0,0)
-});
-
-var clock = new THREE.Clock();
-
-function animate() {
-  requestAnimationFrame(animate);
-  var t = clock.getElapsedTime();
-  shapes.forEach(shape => shape.rotation.set(t,t*2,0));
-  renderer.render(scene, camera);
+function buildMap() {
+	var map = new mapClass(); //this also registers itself to currentLevel
+	for (var x = 0; x < map.tiles.length; x++) {
+		for (var y = 0; y < map.tiles[0].length; y++) {
+			var gameItem = tileStateToGameItem[map.tiles[x][y]]();
+			if (!!gameItem) {
+				var [posx, posy] = map.tileToCoords(x,y);
+				gameItem.position.set(posx, posy, 0);
+				currentLevel.gameEntities.push(gameItem);
+			}
+		}
+	}
+	
+	currentLevel.gameEntities.forEach(entity => scene.add(entity));
 }
 
-animate();
+buildMap();
 
 // Now, show what the camera sees on the screen:
 renderer.render(scene, camera);

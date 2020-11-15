@@ -1,4 +1,4 @@
-const SIZE = 25;
+const SIZE = 4;
 
 const colors = {
   RED : 0xe60b0b,
@@ -62,13 +62,14 @@ function newCoin(size = SIZE/2) {
     sidePillar.position.set(0,size*2*sign,0);
     origin.add(sidePillar);
   }
-  
+  origin.name = tileStates.COIN;
   return origin;
 }
 
 function newCoinMagnet() {
   var origin = newMagnet();
   origin.add(newCoin(SIZE/3));
+  origin.name = tileStates.MAGNET;
   return origin;
 }
 
@@ -100,7 +101,7 @@ function newSpeedBoost() {
     
     origin.add(leadingCube);
   }    
-  
+  origin.name = tileStates.SPEEDBOOST;
   return origin;
 }
 
@@ -135,6 +136,7 @@ function newLevelUp() {
     origin.add(plus);
   }    
   
+  origin.name = tileStates.LEVELUP;
   return origin;
 }
 
@@ -190,6 +192,7 @@ function newPhase() {
     cube.position.set(0,0,size*signZ);
     origin.add(cube);
   } 
+  origin.name = tileStates.PHASE;
   return origin;
 }
 
@@ -219,6 +222,7 @@ function newScrabbler() {
     );
     origin.add(cube);
   } 
+  origin.name = tileStates.SCRABBLER;
   return origin;
 }
 
@@ -259,5 +263,26 @@ function newHeart() {
     origin.add(sidePillar);
   }    
   
+  origin.name = tileStates.HEART;
   return origin;
+}
+
+function newWall() {
+	var size = SIZE * 4;
+	var shape = new THREE.CubeGeometry(size,size,size);
+    var cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
+    var cube = new THREE.Mesh(shape, cover);
+	cube.name = tileStates.WALL;
+	return cube;
+}
+
+const tileStateToGameItem = {
+	[tileStates.EMPTY] : function(){},
+	[tileStates.WALL] : newWall,
+	[tileStates.COIN] : newCoin,
+	[tileStates.MAGNET] : newCoinMagnet,
+	[tileStates.HEART] : newHeart,
+	[tileStates.LEVELUP] : newLevelUp,
+	[tileStates.PHASER] : newPhase,
+	[tileStates.SCRABBLER] : newScrabbler
 }

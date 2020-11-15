@@ -8,7 +8,7 @@ const tileStates = {
 	MAGNET : 3,
 	HEART : 4,
 	LEVELUP : 5,
-	PHAZER : 6,
+	PHASER : 6,
 	SCRABBLER : 7
 }
 
@@ -22,7 +22,7 @@ const settings = {
 		HEART : 3,
 		MAGNET : 5,
 		SCRABBLER : 7,
-		PHAZER : 9,
+		PHASER : 9,
 	},
 	
 	DENSITY : {
@@ -31,7 +31,7 @@ const settings = {
 		HEART : 0.1, 
 		MAGNET : 0.005,
 		SCRABBLER : 0.005,
-		PHAZER : 0.005,
+		PHASER : 0.005,
 	},
 	
     CUBESCALEDOWN : 2,
@@ -42,7 +42,9 @@ var currentLevel = {
 	MAP : null,
 	PLAYER : null,
 	HUNTER : null,
-	level : 0
+	level : 0,
+	gameEntities : [],
+	walls : []
 }
 
 Object.freeze(tileStates);
@@ -56,21 +58,9 @@ function twoDarray(x, y, fill) {
 	return dx;
 }
 
-class tileObject {
-	constructor(type, posX, posY) {
-		this.type = type;
-		this.posX = posX;
-		this.posY = posY;
-	}
-	
-	toWallState() {
-		return this.type == tileStates.WALL ? 1 : 0;
-	}
-}
-
 var finder = new PF.AStarFinder();
 
-class map {
+class mapClass {
 	constructor() {
 		//console.log(innerWidth, document.body.clientWidth, innerHeight);
 		this.widthX = Math.floor(innerWidth / settings.TILEWIDTH);
@@ -83,7 +73,8 @@ class map {
 		//First, generate all game items
 		
 		for (var gameItem in settings.DENSITY) {
-			if (settings.MINLEVEL[gameItem] >= currentLevel.level) {
+			console.log(currentLevel.level, settings.MINLEVEL[gameItem], settings.MINLEVEL[gameItem] <= currentLevel.level);
+			if (settings.MINLEVEL[gameItem] <= currentLevel.level) {
 				for (var i = 0; i < this.getItemDensity(gameItem); i++) {
 					var [x, y] = this.getRandomAvailablePoint();
 					this.tiles[x][y] = tileStates[gameItem];
@@ -160,6 +151,7 @@ class map {
 		y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
 		]
 	}
+	
 	coordsToTile(x,y) {
 		return [
 		Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
@@ -167,5 +159,3 @@ class map {
 		]
 	}
 }
-
-new map();
