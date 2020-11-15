@@ -268,8 +268,7 @@ function newHeart() {
 }
 
 function newWall() {
-	var size = SIZE * 4;
-	var shape = new THREE.CubeGeometry(size,size,size);
+	var shape = new THREE.CubeGeometry(settings.TILEWIDTH,settings.TILEWIDTH,settings.TILEWIDTH);
     var cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
     var cube = new THREE.Mesh(shape, cover);
 	cube.name = tileStates.WALL;

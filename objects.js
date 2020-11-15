@@ -73,7 +73,6 @@ class mapClass {
 		//First, generate all game items
 		
 		for (var gameItem in settings.DENSITY) {
-			console.log(currentLevel.level, settings.MINLEVEL[gameItem], settings.MINLEVEL[gameItem] <= currentLevel.level);
 			if (settings.MINLEVEL[gameItem] <= currentLevel.level) {
 				for (var i = 0; i < this.getItemDensity(gameItem); i++) {
 					var [x, y] = this.getRandomAvailablePoint();
