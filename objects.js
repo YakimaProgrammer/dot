@@ -44,7 +44,7 @@ var currentLevel = {
 	HUNTER : null,
 	level : 0,
 	gameEntities : [],
-	walls : []
+	collisions : [],
 }
 
 Object.freeze(tileStates);
@@ -119,6 +119,8 @@ class mapClass {
 		this.hunterY = hunterY;
 		this.levelUpX = levelUpX;
 		this.levelUpY = levelUpY;
+		
+		this.tiles[levelUpX][levelUpY] = tileStates.LEVELUP;
 		
 		currentLevel.MAP = this;
 		

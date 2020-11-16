@@ -4,11 +4,12 @@ var scene = new THREE.Scene();
 // This is what sees the stuff:
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-camera.position.set(window.innerWidth / 2, window.innerHeight / 2,  500);
+//camera.position.set(window.innerWidth / 2, window.innerHeight / 2,  500);
 //camera.position.y = 0;
 //camera.position.x = innerWidth;
-
-scene.add(camera);
+//scene.add(camera);
+camera.position.z = 250;
+player.add(camera);
 
 // This will draw what the camera sees onto the screen:
 
@@ -37,30 +38,52 @@ function buildMap() {
 	var cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
 	var wall = new THREE.Mesh(shape, cover);
 	wall.position.set(-settings.TILEWIDTH*1.5,settings.TILEWIDTH*map.heightY/2-settings.TILEWIDTH,0);
+	wall.name = tileStates.WALL;
 	currentLevel.gameEntities.push(wall);
 	
 	shape = new THREE.CubeGeometry(settings.TILEWIDTH,settings.TILEWIDTH*map.heightY,settings.TILEWIDTH);
 	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
 	wall = new THREE.Mesh(shape, cover);
 	wall.position.set(map.widthX*settings.TILEWIDTH,settings.TILEWIDTH*map.heightY/2-settings.TILEWIDTH,0);
+	wall.name = tileStates.WALL;
 	currentLevel.gameEntities.push(wall);
 	
 	shape = new THREE.CubeGeometry(settings.TILEWIDTH*map.widthX + (settings.TILEWIDTH * 2.5),settings.TILEWIDTH,settings.TILEWIDTH);
 	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
 	wall = new THREE.Mesh(shape, cover);
 	wall.position.set(settings.TILEWIDTH*(map.widthX/2) -settings.TILEWIDTH*0.75,-settings.TILEWIDTH*1.5,0);
+	wall.name = tileStates.WALL;
 	currentLevel.gameEntities.push(wall);
 	
 	shape = new THREE.CubeGeometry(settings.TILEWIDTH*map.widthX + (settings.TILEWIDTH * 2.5),settings.TILEWIDTH,settings.TILEWIDTH);
 	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
 	wall = new THREE.Mesh(shape, cover);
-	wall.position.set(settings.TILEWIDTH*(map.widthX/2) -settings.TILEWIDTH*0.75,settings.TILEWIDTH*map.heightY-settings.TILEWIDTH,0);
+	wall.position.set(settings.TILEWIDTH*(map.widthX/2) -settings.TILEWIDTH*0.75,settings.TILEWIDTH*map.heightY-settings.TILEWIDTH*0.5,0);
+	wall.name = tileStates.WALL;
 	currentLevel.gameEntities.push(wall);
 	
+	
+	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
+	player.position.set(playerX,playerY,0);
+	
 	currentLevel.gameEntities.forEach(entity => scene.add(entity));
+	currentLevel.walls = currentLevel.gameEntities.filter(e => e.name == tileStates.WALL);
 }
 
+scene.add(player);
 buildMap();
+
+//I want to render 60 frames per second
+
+currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+
+setInterval(function() {
+	//first, get all collisions
+	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+	movePlayer();
+	renderer.render(scene, camera);
+},1000/60);
+
 
 // Now, show what the camera sees on the screen:
 renderer.render(scene, camera);
