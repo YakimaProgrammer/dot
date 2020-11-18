@@ -1,10 +1,7 @@
 function squareCollide(shapeA, shapeB) {
 	computeBoundingBox(shapeA);
 	computeBoundingBox(shapeB);
-
-	shapeA.updateMatrixWorld();
-	shapeB.updateMatrixWorld();
-	  
+  
 	var boxA = {min : shapeA.localToWorld(shapeA.geometry.boundingBox.min), max : shapeA.localToWorld(shapeA.geometry.boundingBox.max)}
 	var boxB = {min : shapeB.localToWorld(shapeB.geometry.boundingBox.min), max : shapeB.localToWorld(shapeB.geometry.boundingBox.max)}
 		
@@ -18,6 +15,7 @@ THREE.Object3D.prototype.geometry = {
 }
 
 function computeBoundingBox(shape) {
+	shape.updateMatrixWorld();
 	try {
 		shape.geometry.computeBoundingBox();
 	} catch {

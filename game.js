@@ -68,19 +68,41 @@ function buildMap() {
 	
 	currentLevel.gameEntities.forEach(entity => scene.add(entity));
 	currentLevel.walls = currentLevel.gameEntities.filter(e => e.name == tileStates.WALL);
+	
+	scene.add(player);
 }
 
-scene.add(player);
 buildMap();
 
-//I want to render 60 frames per second
+function onCollision(gameItem) {
+	switch (gameItem.name) {
+		case (tileStates.COIN):
+			scene.remove(gameItem);
+			//increase score
+			break;
+		case (tileStates.LEVELUP):
+			currentLevel.level++;
+			scene.children.forEach(child => scene.remove(child));
+			buildMap();
+			break;
+	}
+}
 
-currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+//I want to render 60 frames per second (switch to request animation frame)
 
 setInterval(function() {
-	//first, get all collisions
-	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+	//first, where am I at?
+	var playerPositionBeforeUpdate = player.position.clone();
+	//now, move the player
 	movePlayer();
+	//next, get all collisions
+	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+	currentLevel.collisions.forEach(onCollision);
+	//Am I colliding with any walls?
+	if (!!currentLevel.collisions.filter(c => c.name == tileStates.WALL).length) {
+		//Yes? Move back
+		player.position = playerPositionBeforeUpdate;
+	}
 	renderer.render(scene, camera);
 },1000/60);
 

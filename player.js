@@ -55,14 +55,40 @@ function calculateSpeed(currentSpeed, increasing) {
   newSpeed = Math.min(increasing ? currentSpeed * 1.2 : currentSpeed / 1.03, 5);
   return Math.max(newSpeed,0.5);
 }
-
+/*
 function movePlayer() {
   speedIn = movingIn.map((increasing, index) => calculateSpeed(speedIn[index],increasing));
-  var colliding = isCollidingWithAWall() ? -1 : 1;
-  player.position.x += (speedIn[3] - speedIn[1]) / 5 * colliding;
-  player.position.y += (speedIn[0] - speedIn[2]) / 5 * colliding;
- }
+  var collidedWalls = currentLevel.collisions.filter(c => c.name == tileStates.WALL);
+  if (!!collidedWalls.length) {
+	//first, move back
+	player.position.x -= Math.sign(speedIn[3] - speedIn[1]);
+    player.position.y -= Math.sign(speedIn[0] - speedIn[2]);
 
-function isCollidingWithAWall() {
-	return !!currentLevel.collisions.filter(c => c.name == tileStates.WALL).length;
+	
+	//first, where am I?
+	var [playerX, playerY] = currentLevel.MAP.coordsToTile(player.position.x,player.position.y);
+	var [tileX, tileY] = currentLevel.MAP.coordsToTile(collidedWalls[0].position.x,collidedWalls[0].position.y);
+	
+	//now, nullify my speed in the direction of the wall (Give me a drifting against the face of the wall effect);
+	
+	if (tileX != playerX) {
+		speedIn[3] = 0;
+		speedIn[1] = 0;
+	} else {
+		speedIn[2] = 0;
+		speedIn[0] = 0;
+	}
+	
+	
+  } else {
+	//keep advancing - I'm not hitting any walls
+	player.position.x += (speedIn[3] - speedIn[1]) / 5;
+    player.position.y += (speedIn[0] - speedIn[2]) / 5;
+  } 
+}
+*/
+function movePlayer() {
+  speedIn = movingIn.map((increasing, index) => calculateSpeed(speedIn[index],increasing));
+  player.position.x += (speedIn[3] - speedIn[1]) / 5;
+  player.position.y += (speedIn[0] - speedIn[2]) / 5;
 }
