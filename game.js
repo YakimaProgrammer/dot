@@ -99,10 +99,7 @@ setInterval(function() {
 	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
 	currentLevel.collisions.forEach(onCollision);
 	//Am I colliding with any walls?
-	if (!!currentLevel.collisions.filter(c => c.name == tileStates.WALL).length) {
-		//Yes? Move back
-		player.position = playerPositionBeforeUpdate;
-	}
+	updatePlayer(playerPositionBeforeUpdate);
 	renderer.render(scene, camera);
 },1000/60);
 

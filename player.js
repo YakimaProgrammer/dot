@@ -92,3 +92,36 @@ function movePlayer() {
   player.position.x += (speedIn[3] - speedIn[1]) / 5;
   player.position.y += (speedIn[0] - speedIn[2]) / 5;
 }
+
+function updatePlayer(oldPosition) {
+	//Am I colliding with a wall?
+	var walls = currentLevel.collisions.filter(c => c.name == tileStates.WALL);
+	if (!!walls.length) {
+		//Yes? Move back
+		player.position = oldPosition;
+		
+		//detect my relation to the wall in terms of tiles
+		var [playerX, playerY] = currentLevel.MAP.coordsToTile(player.position.x,player.position.y);
+		var [tileX, tileY] = currentLevel.MAP.coordsToTile(walls[0].position.x,walls[0].position.y);
+		
+		//nullify my speed in the direction of the wall (Give me a drifting against the face of the wall effect);
+		if (tileX != playerX) {
+			speedIn[3] = 0;
+			speedIn[1] = 0;
+		} else {
+			speedIn[2] = 0;
+			speedIn[0] = 0;
+		}
+		
+		if (tileX < playerX) {
+			player.position.x += 0.5;
+		} else if (tileX > playerX) {
+			player.position.x -= 0.5;
+		} else if (tileY < playerY) {
+			player.position.y += 0.5;
+		} else if (tileY > playerY) {
+			player.position.y -= 0.5;
+		}
+		
+	}
+}
