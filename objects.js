@@ -9,7 +9,8 @@ const tileStates = {
 	HEART : 4,
 	LEVELUP : 5,
 	PHASER : 6,
-	SCRABBLER : 7
+	SCRABBLER : 7,
+	HUNTER : 8
 }
 
 const settings = {
