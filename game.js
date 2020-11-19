@@ -90,6 +90,8 @@ function onCollision(gameItem) {
 
 //I want to render 60 frames per second (switch to request animation frame)
 
+var clock = new THREE.Clock();
+
 setInterval(function() {
 	//first, where am I at?
 	var playerPositionBeforeUpdate = player.position.clone();
@@ -100,6 +102,14 @@ setInterval(function() {
 	currentLevel.collisions.forEach(onCollision);
 	//Am I colliding with any walls?
 	updatePlayer(playerPositionBeforeUpdate);
+	
+	//Now, all the fancy stuff
+	var t = clock.getElapsedTime();
+	currentLevel.gameEntities.forEach(function(e) {
+		if (!(e.name == tileStates.WALL || e.name == tileStates.HUNTER)) {
+			e.rotation.set(t,t*2,0);
+		}
+	});
 	renderer.render(scene, camera);
 },1000/60);
 
