@@ -4,12 +4,11 @@ var scene = new THREE.Scene();
 // This is what sees the stuff:
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-//camera.position.set(window.innerWidth / 2, window.innerHeight / 2,  500);
-//camera.position.y = 0;
-//camera.position.x = innerWidth;
-//scene.add(camera);
 camera.position.z = 250;
 player.add(camera);
+
+//camera.position.set(window.innerWidth / 2,window.innerHeight / 2,500);
+//scene.add(camera);
 
 // This will draw what the camera sees onto the screen:
 
@@ -34,40 +33,40 @@ function buildMap() {
 	
 	//Now create the bounding box
 	
-	var shape = new THREE.CubeGeometry(settings.TILEWIDTH,settings.TILEWIDTH*map.heightY,settings.TILEWIDTH);
-	var cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
-	var wall = new THREE.Mesh(shape, cover);
-	wall.position.set(-settings.TILEWIDTH*1.5,settings.TILEWIDTH*map.heightY/2-settings.TILEWIDTH,0);
-	wall.name = tileStates.WALL;
-	currentLevel.gameEntities.push(wall);
+	//x
+	var wall;
+	for (var i = 0; i < map.tiles[0].length; i++) {
+		wall = newWall();
+		var [x, y] = map.tileToCoords(0,i);
+		wall.position.set(x,y,0);
+		wall.name = tileStates.WALL;
+		currentLevel.gameEntities.push(wall);
+		
+		wall = newWall();
+		var [x, y] = map.tileToCoords(map.tiles.length,i);
+		wall.position.set(x,y,0);
+		wall.name = tileStates.WALL;
+		currentLevel.gameEntities.push(wall);
+	}
 	
-	shape = new THREE.CubeGeometry(settings.TILEWIDTH,settings.TILEWIDTH*map.heightY,settings.TILEWIDTH);
-	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
-	wall = new THREE.Mesh(shape, cover);
-	wall.position.set(map.widthX*settings.TILEWIDTH,settings.TILEWIDTH*map.heightY/2-settings.TILEWIDTH,0);
-	wall.name = tileStates.WALL;
-	currentLevel.gameEntities.push(wall);
-	
-	shape = new THREE.CubeGeometry(settings.TILEWIDTH*map.widthX + (settings.TILEWIDTH * 2.5),settings.TILEWIDTH,settings.TILEWIDTH);
-	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
-	wall = new THREE.Mesh(shape, cover);
-	wall.position.set(settings.TILEWIDTH*(map.widthX/2) -settings.TILEWIDTH*0.75,-settings.TILEWIDTH*1.5,0);
-	wall.name = tileStates.WALL;
-	currentLevel.gameEntities.push(wall);
-	
-	shape = new THREE.CubeGeometry(settings.TILEWIDTH*map.widthX + (settings.TILEWIDTH * 2.5),settings.TILEWIDTH,settings.TILEWIDTH);
-	cover = new THREE.MeshBasicMaterial({color: colors.BLACK});
-	wall = new THREE.Mesh(shape, cover);
-	wall.position.set(settings.TILEWIDTH*(map.widthX/2) -settings.TILEWIDTH*0.75,settings.TILEWIDTH*map.heightY-settings.TILEWIDTH*0.5,0);
-	wall.name = tileStates.WALL;
-	currentLevel.gameEntities.push(wall);
-	
+	for (var i = 0; i < map.tiles.length+1; i++) {
+		wall = newWall();
+		var [x, y] = map.tileToCoords(i,0);
+		wall.position.set(x,y,0);
+		wall.name = tileStates.WALL;
+		currentLevel.gameEntities.push(wall);
+		
+		wall = newWall();
+		var [x, y] = map.tileToCoords(i,map.tiles[0].length);
+		wall.position.set(x,y,0);
+		wall.name = tileStates.WALL;
+		currentLevel.gameEntities.push(wall);
+	}
 	
 	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
 	player.position.set(playerX,playerY,0);
 	
 	currentLevel.gameEntities.forEach(entity => scene.add(entity));
-	currentLevel.walls = currentLevel.gameEntities.filter(e => e.name == tileStates.WALL);
 	
 	scene.add(player);
 }
@@ -79,8 +78,6 @@ function squareCollide(shapeA, shapeB) {
 	var boxB = new THREE.Box3().setFromObject(shapeB);
 	return boxA.intersectsBox(boxB);
 }
-
-var colliding = false;
 
 function onCollision(gameItem) {
 	switch (gameItem.name) {
@@ -116,9 +113,6 @@ function onCollision(gameItem) {
 			} else if (tileY > playerY) {
 				player.position.y -= 0.5;
 			}
-			
-			colliding = true;
-			
 	}
 }
 
@@ -129,11 +123,10 @@ var playerPositionBeforeUpdate;
 
 setInterval(function() {
 	//first, where am I at?
-	if (!colliding) playerPositionBeforeUpdate = player.position.clone(); 
+	playerPositionBeforeUpdate = player.position.clone(); 
 	//now, move the player
 	movePlayer();
 	//next, get all collisions
-	colliding = false;
 	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
 	currentLevel.collisions.forEach(onCollision);
 	
