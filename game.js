@@ -107,6 +107,16 @@ function onCollision(gameItem) {
 				speedIn[0] = 0;
 			}
 			
+			if (tileX < playerX) {
+				player.position.x += 0.5;
+			} else if (tileX > playerX) {
+				player.position.x -= 0.5;
+			} else if (tileY < playerY) {
+				player.position.y += 0.5;
+			} else if (tileY > playerY) {
+				player.position.y -= 0.5;
+			}
+			
 			colliding = true;
 			
 	}
@@ -119,7 +129,7 @@ var playerPositionBeforeUpdate;
 
 setInterval(function() {
 	//first, where am I at?
-	if (!colliding) playerPositionBeforeUpdate = player.position.clone(); //I want this as a global to make it easier to access in oncollision
+	if (!colliding) playerPositionBeforeUpdate = player.position.clone(); 
 	//now, move the player
 	movePlayer();
 	//next, get all collisions
