@@ -13,7 +13,7 @@ player.add(camera);
 
 // This will draw what the camera sees onto the screen:
 
-renderer = new THREE.CanvasRenderer();
+renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 document.body.style.overflow = "hidden"; //I don't love this solution, but I can't get my computer to stop reading the total screen width/height instead of the actual width/height
