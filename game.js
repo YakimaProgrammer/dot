@@ -80,6 +80,8 @@ function squareCollide(shapeA, shapeB) {
 	return boxA.intersectsBox(boxB);
 }
 
+var colliding = false;
+
 function onCollision(gameItem) {
 	switch (gameItem.name) {
 		case (tileStates.COIN):
@@ -91,23 +93,39 @@ function onCollision(gameItem) {
 			scene.children.forEach(child => scene.remove(child));
 			buildMap();
 			break;
+		case (tileStates.WALL):
+			player.position.copy(playerPositionBeforeUpdate);
+			
+			var [playerX, playerY] = currentLevel.MAP.coordsToTile(player.position.x,player.position.y);
+			var [tileX, tileY] = currentLevel.MAP.coordsToTile(gameItem.position.x,gameItem.position.y);
+		
+			if (tileX != playerX) {
+				speedIn[3] = 0;
+				speedIn[1] = 0;
+			} else {
+				speedIn[2] = 0;
+				speedIn[0] = 0;
+			}
+			
+			colliding = true;
+			
 	}
 }
 
 //I want to render 60 frames per second (switch to request animation frame)
 
 var clock = new THREE.Clock();
+var playerPositionBeforeUpdate;
 
 setInterval(function() {
 	//first, where am I at?
-	var playerPositionBeforeUpdate = player.position.clone();
+	if (!colliding) playerPositionBeforeUpdate = player.position.clone(); //I want this as a global to make it easier to access in oncollision
 	//now, move the player
 	movePlayer();
 	//next, get all collisions
+	colliding = false;
 	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
 	currentLevel.collisions.forEach(onCollision);
-	//Am I colliding with any walls?
-	updatePlayer(playerPositionBeforeUpdate);
 	
 	//Now, all the fancy stuff
 	var t = clock.getElapsedTime();
