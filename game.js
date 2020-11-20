@@ -49,6 +49,7 @@ function buildMap() {
 		currentLevel.gameEntities.push(wall);
 	}
 	
+	//y
 	for (var i = 0; i < map.tiles.length+1; i++) {
 		wall = newWall();
 		var [x, y] = map.tileToCoords(i,0);
@@ -62,6 +63,8 @@ function buildMap() {
 		wall.name = tileStates.WALL;
 		currentLevel.gameEntities.push(wall);
 	}
+	
+	//add the player
 	
 	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
 	player.position.set(playerX,playerY,0);
@@ -79,15 +82,17 @@ function squareCollide(shapeA, shapeB) {
 	return boxA.intersectsBox(boxB);
 }
 
+var score = 0;
+var scoreholder = document.getElementById("scoreholder");
+
 function onCollision(gameItem) {
 	switch (gameItem.name) {
 		case (tileStates.COIN):
-			scene.remove(gameItem);
-			//increase score
+			score += 1;
+			scoreholder.innerText = score; 
 			break;
 		case (tileStates.LEVELUP):
 			currentLevel.level++;
-			scene.children.forEach(child => scene.remove(child));
 			buildMap();
 			break;
 		case (tileStates.WALL):
@@ -113,6 +118,12 @@ function onCollision(gameItem) {
 			} else if (tileY > playerY) {
 				player.position.y -= 0.5;
 			}
+			break;
+	}
+	
+	if (gameItem.name != tileStates.WALL) {
+		scene.remove(gameItem); //hide the item
+		gameItem.position.set(-50,-50,0); //move the item outside of the map so I don't keep hitting it
 	}
 }
 
