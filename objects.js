@@ -37,6 +37,7 @@ const settings = {
 	
     CUBESCALEDOWN : 2,
 	TILEWIDTH : 16,
+	HUNTERSPEED : 0.15
 }
 
 var currentLevel = {
@@ -93,19 +94,23 @@ class mapClass {
 			//Double check that the player and the hunter are not too close
 			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2) < 5) {
 				continue; //force next loop now
-			} 
+			}
+
+			if (((playerX - levelUpX) ** 2 + (playerY - levelUpY) ** 2) < 5) {
+				continue; //force next loop now
+			}
 			
 			//Now make sure that they can reach each other
-			if (!this.getPath(playerX, playerY, hunterX, hunterY)) {
+			if (!this.getPath(playerX, playerY, hunterX, hunterY).length) {
 				continue;
 			}
 			
 			//and that the player can level up
-			if (!this.getPath(playerX, playerY, levelUpX, levelUpY)) {
+			if (!this.getPath(playerX, playerY, levelUpX, levelUpY).length) {
 				continue;
 			}
 			
-			stillSpawning = false;
+			stillSpawning = false; //break out of loop
 		}
 
 		this.asArray = this.tiles.map(function(secondaryArray) {

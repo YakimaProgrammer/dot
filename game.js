@@ -65,16 +65,21 @@ function buildMap() {
 	}
 	
 	//add the player
-	
 	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
 	player.position.set(playerX,playerY,0);
 	
-	currentLevel.gameEntities.forEach(entity => scene.add(entity));
+	//add the hunter
+	var [hunterX,hunterY] = map.tileToCoords(map.hunterX,map.hunterY);
+	hunter.position.set(hunterX,hunterY,0);
+	//console.log(hunterX,hunterY,hunter.position);
 	
-	scene.add(player);
+	currentLevel.gameEntities.forEach(entity => scene.add(entity));
 }
 
 buildMap();
+
+scene.add(hunter);
+scene.add(player);
 
 function squareCollide(shapeA, shapeB) {
 	var boxA = new THREE.Box3().setFromObject(shapeA);
@@ -139,7 +144,10 @@ setInterval(function() {
 	movePlayer();
 	//next, get all collisions
 	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
-	currentLevel.collisions.forEach(onCollision);
+	currentLevel.collisions.forEach(onCollision); //Unmoves player if necessary
+	
+	//Move the hunter
+	updateHunter(); //Pathfinding is updated in another loop
 	
 	//Now, all the fancy stuff
 	var t = clock.getElapsedTime();
