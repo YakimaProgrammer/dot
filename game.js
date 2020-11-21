@@ -95,10 +95,14 @@ function onCollision(gameItem) {
 			score += 1;
 			scoreholder.innerText = score; 
 			break;
+			
 		case (tileStates.LEVELUP):
+			currentLevel.gameEntities.forEach(e => scene.remove(e));
+			currentLevel.gameEntities.length = 0;
 			currentLevel.level++;
 			buildMap();
 			break;
+			
 		case (tileStates.WALL):
 			player.position.copy(playerPositionBeforeUpdate);
 			
