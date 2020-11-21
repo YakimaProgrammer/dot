@@ -37,7 +37,7 @@ const settings = {
 	
     CUBESCALEDOWN : 2,
 	TILEWIDTH : 16,
-	HUNTERSPEED : 0.15
+	HUNTERSPEED : 0.75
 }
 
 var currentLevel = {

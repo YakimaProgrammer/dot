@@ -19,7 +19,7 @@ function updateHunter() {
 	if (destX == hunterX && destY == hunterY) {
 		//first, re-center me in the tile
 		var [x,y] = currentLevel.MAP.tileToCoords(destX,destY);
-		hunter.position.set(x,y,0);
+		//hunter.position.set(x,y,0);
 		
 		//now, get the next destination tile
 		currentLevel.PATH.shift();
