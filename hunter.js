@@ -24,9 +24,10 @@ function updateHunter() {
 	}
 	//Now, recenter the hunter in the tile
 	var [x,y] = currentLevel.MAP.tileToCoords(destX,destY);
-	if (hunterX == destX) hunter.position.x = x;
-	if (hunterY == destY) hunter.position.y = y;
-	
+	//if (hunterX == destX) hunter.position.x = (hunter.position.x + x) / 2;
+	//if (hunterY == destY) hunter.position.y = (hunter.position.y + y) / 2;
+	if (hunterX == destX) hunter.position.x += (x - hunter.position.x) / 5;
+	if (hunterY == destY) hunter.position.y += (y - hunter.position.y) / 5;
 	
 	
 	hunterSpeedIn = [
