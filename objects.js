@@ -37,6 +37,7 @@ const settings = {
 	
     CUBESCALEDOWN : 2,
 	TILEWIDTH : 16,
+	HUNTERSPEED : 0.75
 }
 
 var currentLevel = {
@@ -58,6 +59,8 @@ function twoDarray(x, y, fill) {
 	}
 	return dx;
 }
+
+transpose = m => m[0].map((x,i) => m.map(x => x[i])); //transpose an array
 
 var finder = new PF.AStarFinder();
 
@@ -82,6 +85,14 @@ class mapClass {
 			}
 		}
 		
+		this.asArray = transpose(
+			this.tiles.map(function(secondaryArray) {
+				return secondaryArray.map(function(item) {
+					return item == tileStates.WALL ? 1 : 0;
+				});
+			})
+		); //I need to transpose the array otherwise pathfinding does not work in the right most third of the map (depending on screen resolution);
+				
 		var playerX, playerY, hunterX, hunterY, levelUpX, levelUpY;
 		var stillSpawning = true;
 		
@@ -93,27 +104,25 @@ class mapClass {
 			//Double check that the player and the hunter are not too close
 			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2) < 5) {
 				continue; //force next loop now
-			} 
+			}
+
+			if (((playerX - levelUpX) ** 2 + (playerY - levelUpY) ** 2) < 5) {
+				continue; //force next loop now
+			}
 			
 			//Now make sure that they can reach each other
-			if (!this.getPath(playerX, playerY, hunterX, hunterY)) {
+			if (!this.getPath(playerX, playerY, hunterX, hunterY).length) {
 				continue;
 			}
 			
 			//and that the player can level up
-			if (!this.getPath(playerX, playerY, levelUpX, levelUpY)) {
+			if (!this.getPath(playerX, playerY, levelUpX, levelUpY).length) {
 				continue;
 			}
 			
-			stillSpawning = false;
+			stillSpawning = false; //break out of loop
 		}
 
-		this.asArray = this.tiles.map(function(secondaryArray) {
-			return secondaryArray.map(function(item) {
-				return item == tileStates.WALL ? 1 : 0;
-			});
-		});
-		
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.hunterX = hunterX;
@@ -144,7 +153,7 @@ class mapClass {
 	}
 	
 	getPath(x1,y1,x2,y2) {
-		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.widthX, this.heightY, this.asArray));
+		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.asArray));
 	}
 	
 	tileToCoords(x,y) {
