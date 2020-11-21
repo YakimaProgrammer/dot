@@ -135,26 +135,43 @@ function onCollision(gameItem) {
 
 var clock = new THREE.Clock();
 var playerPositionBeforeUpdate;
+var gameOver = false;
+
 
 setInterval(function() {
-	//first, where am I at?
-	playerPositionBeforeUpdate = player.position.clone(); 
-	//now, move the player
-	movePlayer();
-	//next, get all collisions
-	currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
-	currentLevel.collisions.forEach(onCollision); //Unmoves player if necessary
-	
-	//Move the hunter
-	updateHunter(); //Pathfinding is updated in another loop
-	
-	//Now, rotate all coins, power ups
-	var t = clock.getElapsedTime();
-	currentLevel.gameEntities.forEach(function(e) {
-		if (!(e.name == tileStates.WALL || e.name == tileStates.HUNTER)) {
-			e.rotation.set(t,t*2,0);
+	//short cuircut check: is the game over?
+	if (gameOver) {
+		camera.position.z -= camera.position.z / 2500; 
+	} else {
+		//first, where am I at?
+		playerPositionBeforeUpdate = player.position.clone(); 
+		//now, move the player
+		movePlayer();
+		//next, get all collisions
+		currentLevel.collisions = currentLevel.gameEntities.filter(e => squareCollide(e,player));
+		currentLevel.collisions.forEach(onCollision); //Unmoves player if necessary
+		
+		//Move the hunter
+		updateHunter(); //Pathfinding is updated in another loop
+
+		//Now, check if I am colliding with the DEATHAURA
+		if (squareCollide(deathAura,player)) {
+			currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
+			//ghostifyEntitiy(player);
+			ghostifyEntitiy(hunter);
+			ghostifyEntitiy(deathAura);
+			
+			gameOver = true;
 		}
-	});
+		
+		//Now, rotate all coins, power ups
+		var t = clock.getElapsedTime();
+		currentLevel.gameEntities.forEach(function(e) {
+			if (!(e.name == tileStates.WALL || e.name == tileStates.HUNTER)) {
+				e.rotation.set(t,t*2,0);
+			}
+		});
+	}
 	renderer.render(scene, camera);
 },1000/60);
 
