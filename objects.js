@@ -60,6 +60,8 @@ function twoDarray(x, y, fill) {
 	return dx;
 }
 
+transpose = m => m[0].map((x,i) => m.map(x => x[i])); //transpose an array
+
 var finder = new PF.AStarFinder();
 
 class mapClass {
@@ -83,6 +85,14 @@ class mapClass {
 			}
 		}
 		
+		this.asArray = transpose(
+			this.tiles.map(function(secondaryArray) {
+				return secondaryArray.map(function(item) {
+					return item == tileStates.WALL ? 1 : 0;
+				});
+			})
+		); //I need to transpose the array otherwise pathfinding does not work in the right most third of the map (depending on screen resolution);
+				
 		var playerX, playerY, hunterX, hunterY, levelUpX, levelUpY;
 		var stillSpawning = true;
 		
@@ -113,12 +123,6 @@ class mapClass {
 			stillSpawning = false; //break out of loop
 		}
 
-		this.asArray = this.tiles.map(function(secondaryArray) {
-			return secondaryArray.map(function(item) {
-				return item == tileStates.WALL ? 1 : 0;
-			});
-		});
-		
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.hunterX = hunterX;
@@ -149,7 +153,7 @@ class mapClass {
 	}
 	
 	getPath(x1,y1,x2,y2) {
-		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.widthX, this.heightY, this.asArray));
+		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.asArray));
 	}
 	
 	tileToCoords(x,y) {

@@ -71,7 +71,6 @@ function buildMap() {
 	//add the hunter
 	var [hunterX,hunterY] = map.tileToCoords(map.hunterX,map.hunterY);
 	hunter.position.set(hunterX,hunterY,0);
-	//console.log(hunterX,hunterY,hunter.position);
 	
 	currentLevel.gameEntities.forEach(entity => scene.add(entity));
 }
@@ -149,7 +148,7 @@ setInterval(function() {
 	//Move the hunter
 	updateHunter(); //Pathfinding is updated in another loop
 	
-	//Now, all the fancy stuff
+	//Now, rotate all coins, power ups
 	var t = clock.getElapsedTime();
 	currentLevel.gameEntities.forEach(function(e) {
 		if (!(e.name == tileStates.WALL || e.name == tileStates.HUNTER)) {
