@@ -17,15 +17,17 @@ function updateHunter() {
 		return; //don't move, currentLevel.PATH will be initiated in a couple of milliseconds 
 	}
 	if (destX == hunterX && destY == hunterY) {
-		//first, re-center me in the tile
-		var [x,y] = currentLevel.MAP.tileToCoords(destX,destY);
-		//hunter.position.set(x,y,0);
-		
-		//now, get the next destination tile
+		//get the next destination tile
 		currentLevel.PATH.shift();
 		var [destX, destY] = currentLevel.PATH[0];
 		
 	}
+	//Now, recenter the hunter in the tile
+	var [x,y] = currentLevel.MAP.tileToCoords(destX,destY);
+	if (hunterX == destX) hunter.position.x = x;
+	if (hunterY == destY) hunter.position.y = y;
+	
+	
 	
 	hunterSpeedIn = [
 		destX < hunterX ? -settings.HUNTERSPEED : settings.HUNTERSPEED,
