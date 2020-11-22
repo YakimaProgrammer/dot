@@ -5,13 +5,17 @@ var scene = new THREE.Scene();
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
 
+var cameraZ;
+
 camera.setpositionone = function() {
-	camera.position.set(0,0,250);
+	cameraZ = 250;
+	camera.position.set(0,0,cameraZ);
 	player.add(camera);
 }
 
 camera.setpositiontwo = function() {
-	camera.position.set(window.innerWidth / 2,window.innerHeight / 2,500);
+	cameraZ = 500;
+	camera.position.set(window.innerWidth / 2,window.innerHeight / 2,cameraZ);
 	scene.add(camera);
 }
 
@@ -107,9 +111,10 @@ function onCollision(gameItem) {
 			break;
 			
 		case (tileStates.LEVELUP):
-			currentLevel.level++;
-			levelsholder.innerText = currentLevel.level + 1;
-			resetWorld();
+			rebuildWorldAnimation(colors.GREEN,function() {
+				currentLevel.level++;
+				levelsholder.innerText = currentLevel.level + 1;
+			},1000);
 			break;
 			
 		case (tileStates.WALL):
@@ -180,12 +185,26 @@ function onCollision(gameItem) {
 
 var clock = new THREE.Clock();
 var playerPositionBeforeUpdate;
-var gameOver = false;
+var gamePaused = false;
+
+function rebuildWorldAnimation(color,callback,time=2500) {
+	gamePaused = true;
+	currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
+	if (color) scene.background = new THREE.Color(color);
+	setTimeout(function() {
+		if (callback) callback();
+		resetWorld();
+		scene.background = null;
+		gamePaused = false;
+		immune = false;
+		camera.position.z = cameraZ;
+		speedIn = [0,0,0,0]; //Stop all of my motion
+	},time);
+}
 
 
 setInterval(function() {
-	//short circuit check: is the game over?
-	if (gameOver || immune) {
+	if (gamePaused) {
 		camera.position.z -= camera.position.z / 2500; 
 	} else {
 		//first, where am I at?
@@ -207,15 +226,18 @@ setInterval(function() {
 				immune = true;
 				currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
 				if (lives > 0) {
-					setTimeout(function() {
-						resetWorld();
-						immune = false;
-					},1000);
+					rebuildWorldAnimation();
 				} else {
-					ghostifyEntitiy(hunter);
-					ghostifyEntitiy(deathAura);
-					scene.background = new THREE.Color(colors.REDGAMEOVER);
-					gameOver = true;
+					rebuildWorldAnimation(colors.REDGAMEOVER, function() {
+						lives = 1;
+						score = 0;
+						currentLevel.level = 0;
+						
+						levelsholder.innerText = 1;
+						livesholder.innerText = 1;
+						scoreholder.innerText = 0;
+					});
+					
 				}
 			}
 		}

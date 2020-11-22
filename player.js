@@ -28,7 +28,12 @@ switch (event.key) {
 	if (!cameraposition) {camera.setpositiontwo()}
 	else {camera.setpositionone()}
 	break;
+  
+  case 'Escape':
+    gamePaused = !gamePaused;
+	camera.position.z = cameraZ;
 }
+console.log(event.key);
 });
 
 document.addEventListener("keyup", function(event) {
