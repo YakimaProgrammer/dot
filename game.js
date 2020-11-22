@@ -6,7 +6,7 @@ var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
 
 camera.setpositionone = function() {
-	camera.position.z = 250;
+	camera.position.set(0,0,250);
 	player.add(camera);
 }
 
@@ -16,6 +16,7 @@ camera.setpositiontwo = function() {
 }
 
 camera.setpositionone();
+var cameraposition = 0;
 
 // This will draw what the camera sees onto the screen:
 
@@ -145,9 +146,16 @@ function onCollision(gameItem) {
 			break;
 			
 		case (tileStates.PHASER):
-			var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
-			var [destX, destY] = currentLevel.MAP.tileToCoords(x,y);
-			player.position.set(destX,destY,0);
+			var choosing = true;
+			var levelup = currentLevel.gameEntities.filter(e => e.name == tileStates.LEVELUP)[0];
+			var [destX,destY] = currentLevel.MAP.coordsToTile(levelup.position.x,levelup.position.y);
+			while (choosing) {
+				var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
+				var [playerX, playerY] = currentLevel.MAP.tileToCoords(x,y);
+				player.position.set(playerX,playerY,0);
+				
+				if(!!currentLevel.MAP.getPath(x,y,destX,destY).length) choosing = false;
+			}
 			break;
 	}
 	if (gameItem.name != tileStates.WALL) {
