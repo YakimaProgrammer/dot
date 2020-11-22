@@ -29,9 +29,6 @@ switch (event.key) {
 	else {camera.setpositionone()}
 	console.log(cameraposition);
 	break;
-
-  case 'm':
-    lockMouse();
 }
 });
 
@@ -57,46 +54,6 @@ switch (event.key) {
 	movingIn[3] = false;
 	break;
 }
-});
-
-document.addEventListener("wheel", e => camera.position.z += e.deltaY / 15);
-
-var mouseWasLocked = false;
-
-function lockMouse() {
-	var e = renderer.domElement;
-	e.requestPointerLock = e.requestPointerLock || e.mozRequestPointerLock;
-	e.requestPointerLock();
-	console.log(document.pointerLockElement);
-}
-
-document.addEventListener("mousemove", function(e) {
-	if (!mouseWasLocked) {
-		lockMouse();
-		mouseWasLocked = true;
-	}
-	
-	switch (Math.sign(e.movementX)) {
-		case 1:
-			movingIn[3] = true;
-			movingIn[1] = false;
-			break;
-		case -1: 
-			movingIn[3] = false;
-			movingIn[1] = true;
-			break;
-	}
-	
-	switch (Math.sign(e.movementY)) {
-		case 1:
-			movingIn[2] = true;
-			movingIn[0] = false;
-			break;
-		case -1: 
-			movingIn[2] = false;
-			movingIn[0] = true;
-			break;
-	}
 });
 
 var player = new THREE.Mesh(new THREE.CubeGeometry(SIZE*2,SIZE*2,SIZE*2), new THREE.MeshNormalMaterial());
