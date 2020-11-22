@@ -36,40 +36,7 @@ function buildMap() {
 			}
 		}
 	}
-	
-	//Now create the bounding box
-	
-	//x
-	var wall;
-	for (var i = 0; i < map.tiles[0].length; i++) {
-		wall = newWall();
-		var [x, y] = map.tileToCoords(0,i);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
 		
-		wall = newWall();
-		var [x, y] = map.tileToCoords(map.tiles.length,i);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-	}
-	
-	//y
-	for (var i = 0; i < map.tiles.length+1; i++) {
-		wall = newWall();
-		var [x, y] = map.tileToCoords(i,0);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-		
-		wall = newWall();
-		var [x, y] = map.tileToCoords(i,map.tiles[0].length);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-	}
-	
 	//add the player
 	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
 	player.position.set(playerX,playerY,0);

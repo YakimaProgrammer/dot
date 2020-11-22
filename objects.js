@@ -72,6 +72,10 @@ class mapClass {
 		
 		this.tiles = twoDarray(this.widthX, this.heightY, tileStates.EMPTY);
 		
+		this.tiles[0].fill(tileStates.WALL);
+		this.tiles[this.tiles.length - 1].fill(tileStates.WALL);
+		this.tiles.forEach(function(row){row[0] = tileStates.WALL; row[row.length - 1] = tileStates.WALL});
+		
 		this.numTiles = this.widthX * this.heightY;
 		
 		//First, generate all game items
