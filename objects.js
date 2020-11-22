@@ -47,7 +47,7 @@ var currentLevel = {
 	MAP : null,
 	PLAYER : null,
 	HUNTER : null,
-	level : 4,//0,
+	level : 0,
 	gameEntities : [],
 	collisions : [],
 	speedMultiplier : 1,

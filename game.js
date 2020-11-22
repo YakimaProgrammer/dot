@@ -16,7 +16,7 @@ camera.setpositiontwo = function() {
 }
 
 camera.setpositionone();
-var cameraposition = 0;
+var cameraposition = 1;
 
 // This will draw what the camera sees onto the screen:
 
@@ -85,6 +85,7 @@ var livesholder = document.getElementById("livesholder");
 var levelsholder = document.getElementById("levelholder");
 
 function onCollision(gameItem) {
+	var remove = true;
 	switch (gameItem.name) {
 		case (tileStates.COIN):
 			score += 1;
@@ -92,8 +93,17 @@ function onCollision(gameItem) {
 			break;
 		
 		case (tileStates.HEART):
-			lives += 1;
-			livesholder.innerText = lives; 
+			if (lives > 2) {
+				remove = false;
+				ghostifyEntitiy(gameItem);
+				setTimeout(function() {
+					scene.remove(gameItem);
+					gameItem.position.set(-50,-50,0);
+				},500);
+			} else {
+				lives += 1;
+				livesholder.innerText = lives;
+			}
 			break;
 			
 		case (tileStates.LEVELUP):
@@ -160,7 +170,7 @@ function onCollision(gameItem) {
 			currentLevel.speedStopTime = t + 5;
 			break;
 	}
-	if (gameItem.name != tileStates.WALL) {
+	if ((gameItem.name != tileStates.WALL) && remove) {
 		scene.remove(gameItem); //hide the item
 		gameItem.position.set(-50,-50,0); //move the item outside of the map so I don't keep hitting it
 	}

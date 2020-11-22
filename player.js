@@ -27,7 +27,6 @@ switch (event.key) {
     cameraposition = (cameraposition + 1) % 2;
 	if (!cameraposition) {camera.setpositiontwo()}
 	else {camera.setpositionone()}
-	console.log(cameraposition);
 	break;
 }
 });
