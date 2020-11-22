@@ -160,6 +160,18 @@ function onCollision(gameItem) {
 				player.position.y -= 0.5;
 			}
 			break;
+		
+		case (tileStates.MAGNET):
+			var [targetX, targetY] = currentLevel.MAP.coordsToTile(gameItem.position.x,gameItem.position.y);
+			currentLevel.gameEntities.forEach(function(e) {
+				if (e.name == tileStates.COIN) {
+					var [startX, startY] = currentLevel.MAP.coordsToTile(e.position.x,e.position.y);
+					if (Math.abs(startX) == startX) { //don't try to pathfind already claimed coins
+						e.PATH = currentLevel.MAP.getPath(startX,startY,targetX,targetY);
+					}
+				}
+			});
+		
 	}
 	
 	if (gameItem.name != tileStates.WALL) {
@@ -217,6 +229,16 @@ setInterval(function() {
 		currentLevel.gameEntities.forEach(function(e) {
 			if (!(e.name == tileStates.WALL || e.name == tileStates.HUNTER)) {
 				e.rotation.set(t,t*2,0);
+			}
+		});
+		
+		//If any coins need to be moved, move them
+		currentLevel.gameEntities.forEach(function(e) {
+			if (!!e.PATH && !!e.PATH.length) {
+				var [oldX,oldY] = e.PATH.shift();
+				var [newX,newY] = currentLevel.MAP.tileToCoords(oldX,oldY);
+				e.position.set(newX,newY,0);
+				
 			}
 		});
 	}

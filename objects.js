@@ -44,7 +44,7 @@ var currentLevel = {
 	MAP : null,
 	PLAYER : null,
 	HUNTER : null,
-	level : 0,
+	level : 5,//0,
 	gameEntities : [],
 	collisions : [],
 }
