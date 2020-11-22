@@ -29,7 +29,7 @@ const settings = {
 	DENSITY : {
 		WALL : 0.1,
 		COIN : 0.01,
-		HEART : 0.01, 
+		HEART : 0.0005, 
 		MAGNET : 0.0005,
 		SCRABBLER : 0.0005,
 		PHASER : 0.0005,
@@ -158,15 +158,15 @@ class mapClass {
 	
 	tileToCoords(x,y) {
 		return [
-		x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
-		y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
+			x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
+			y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
 		]
 	}
 	
 	coordsToTile(x,y) {
 		return [
-		Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
-		Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
+			Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
+			Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
 		]
 	}
 }

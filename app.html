@@ -8,8 +8,29 @@
 		<script type="text/javascript" src="player.js" defer></script>
 		<script type="text/javascript" src="hunter.js" defer></script>
 		<script type="text/javascript" src="game.js" defer></script>
+		
+		<style>
+		.scoreboard {
+			position: absolute;
+			display: inline; 
+		}
+		
+		h1 {
+			margin: 0 0 0 0;
+			color: blue;
+		}
+		
+		body {
+			margin: 0;
+			overflow: hidden;
+		}
+		</style>
 	</head>
-	<body style="margin: 0;">
-	<h1 style="position: absolute;display: inline; margin: 0 0 0 0;color:blue;">Score: <span id="scoreholder">0</span></h1>
+	<body>
+		<div class="scoreboard">
+			<h1>Level: <span id="levelholder">1</span></h1>
+			<h1>Lives: <span id="livesholder">1</span></h1>
+			<h1>Score: <span id="scoreholder">0</span></h1>
+		</div>
 	</body>
 </html>

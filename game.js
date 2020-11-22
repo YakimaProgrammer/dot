@@ -4,18 +4,24 @@ var scene = new THREE.Scene();
 // This is what sees the stuff:
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-camera.position.z = 250;
-player.add(camera);
 
-//camera.position.set(window.innerWidth / 2,window.innerHeight / 2,500);
-//scene.add(camera);
+camera.setpositionone = function() {
+	camera.position.z = 250;
+	player.add(camera);
+}
+
+camera.setpositiontwo = function() {
+	camera.position.set(window.innerWidth / 2,window.innerHeight / 2,500);
+	scene.add(camera);
+}
+
+camera.setpositionone();
 
 // This will draw what the camera sees onto the screen:
 
 renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-document.body.style.overflow = "hidden"; //I don't love this solution, but I can't get my computer to stop reading the total screen width/height instead of the actual width/height
 
 // ******** START CODING ON THE NEXT LINE ********
 function buildMap() {
@@ -77,6 +83,25 @@ function buildMap() {
 
 buildMap();
 
+function resetWorld() {
+	/* currentLevel.gameEntities.forEach(function(e) {
+		if (!!e.geometry) {
+			e.material.dispose();
+			e.geometry.dispose();
+		} else {
+			e.children.forEach(function(c) {
+				c.material.dispose();
+				c.geometry.dispose();
+			});
+		}
+		scene.remove(e)
+	}); */
+	currentLevel.gameEntities.forEach(e => scene.remove(e));
+	currentLevel.gameEntities.length = 0;
+	
+	buildMap();
+}
+
 scene.add(hunter);
 scene.add(player);
 
@@ -86,8 +111,12 @@ function squareCollide(shapeA, shapeB) {
 	return boxA.intersectsBox(boxB);
 }
 
-var score = 0;
+var score = 0 
+var lives = 1;
+var immune = false;
 var scoreholder = document.getElementById("scoreholder");
+var livesholder = document.getElementById("livesholder");
+var levelsholder = document.getElementById("levelholder");
 
 function onCollision(gameItem) {
 	switch (gameItem.name) {
@@ -95,12 +124,16 @@ function onCollision(gameItem) {
 			score += 1;
 			scoreholder.innerText = score; 
 			break;
+		
+		case (tileStates.HEART):
+			lives += 1;
+			livesholder.innerText = lives; 
+			break;
 			
 		case (tileStates.LEVELUP):
-			currentLevel.gameEntities.forEach(e => scene.remove(e));
-			currentLevel.gameEntities.length = 0;
 			currentLevel.level++;
-			buildMap();
+			levelsholder.innerText = currentLevel.level + 1;
+			resetWorld();
 			break;
 			
 		case (tileStates.WALL):
@@ -143,7 +176,7 @@ var gameOver = false;
 
 
 setInterval(function() {
-	//short cuircut check: is the game over?
+	//short circuit check: is the game over?
 	if (gameOver) {
 		camera.position.z -= camera.position.z / 2500; 
 	} else {
@@ -160,12 +193,23 @@ setInterval(function() {
 
 		//Now, check if I am colliding with the DEATHAURA
 		if (squareCollide(deathAura,player)) {
-			currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
-			//ghostifyEntitiy(player);
-			ghostifyEntitiy(hunter);
-			ghostifyEntitiy(deathAura);
-			
-			gameOver = true;
+			if (!immune) {
+				lives -= 1;
+				livesholder.innerText = lives; 
+				immune = true;
+				currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
+				if (lives > 0) {
+					setTimeout(function() {
+						resetWorld();
+						immune = false;
+					},1000);
+				} else {
+					ghostifyEntitiy(hunter);
+					ghostifyEntitiy(deathAura);
+					scene.background = new THREE.Color(colors.REDGAMEOVER);
+					gameOver = true;
+				}
+			}
 		}
 		
 		//Now, rotate all coins, power ups

@@ -7,7 +7,8 @@ const colors = {
   YELLOW : 0xffff21,
   GREEN : 0x30c702,
   BLUE : 0x0335ff,
-  BLACK : 0x000000
+  BLACK : 0x000000,
+  REDGAMEOVER : 0xff4747
 };
 
 function newMagnet() {
