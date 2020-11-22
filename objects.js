@@ -10,7 +10,8 @@ const tileStates = {
 	LEVELUP : 5,
 	PHASER : 6,
 	SCRABBLER : 7,
-	HUNTER : 8
+	HUNTER : 8,
+	SPEEDBOOST : 9
 }
 
 const settings = {
@@ -22,6 +23,7 @@ const settings = {
 		COIN : 0,
 		HEART : 3,
 		MAGNET : 4,
+		SPEEDBOOST: 4,
 		SCRABBLER : 5,
 		PHASER : 6,
 	},
@@ -29,10 +31,11 @@ const settings = {
 	DENSITY : {
 		WALL : 0.05,
 		COIN : 0.01,
-		HEART : 0.0005, 
-		MAGNET : 0.0005,
-		SCRABBLER : 0.0005,
-		PHASER : 0.0005,
+		HEART : 0.00025,
+		SPEEDBOOST : 0.00025,		
+		MAGNET : 0.0003,
+		SCRABBLER : 0.0002,
+		PHASER : 0.0002,
 	},
 	
     CUBESCALEDOWN : 2,
@@ -44,9 +47,11 @@ var currentLevel = {
 	MAP : null,
 	PLAYER : null,
 	HUNTER : null,
-	level : 6,//0,
+	level : 4,//0,
 	gameEntities : [],
 	collisions : [],
+	speedMultiplier : 1,
+	speedStopTime : 0
 }
 
 Object.freeze(tileStates);

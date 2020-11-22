@@ -280,6 +280,7 @@ const tileStateToGameItem = {
 	[tileStates.EMPTY] : function(){},
 	[tileStates.WALL] : newWall,
 	[tileStates.COIN] : newCoin,
+	[tileStates.SPEEDBOOST] : newSpeedBoost,
 	[tileStates.MAGNET] : newCoinMagnet,
 	[tileStates.HEART] : newHeart,
 	[tileStates.LEVELUP] : newLevelUp,

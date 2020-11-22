@@ -139,23 +139,25 @@ function onCollision(gameItem) {
 			});
 			break;
 		
-		case (tileStates.SCRABBLER):
+		case (tileStates.SCRABBLER): //I specifically do not check if the destination location can reach the player because there should be a chance that striking one of these powerups will lock the hunter far away, then it becomes a challenge not to collect a SCRABBLER
 			var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
 			var [destX, destY] = currentLevel.MAP.tileToCoords(x,y);
 			hunter.position.set(destX,destY,0);
 			break;
 			
-		case (tileStates.PHASER):
-			var choosing = true;
+		case (tileStates.PHASER): //I do check whether the end position is valid, otherwise the player can not play the game.
 			var levelup = currentLevel.gameEntities.filter(e => e.name == tileStates.LEVELUP)[0];
 			var [destX,destY] = currentLevel.MAP.coordsToTile(levelup.position.x,levelup.position.y);
-			while (choosing) {
+			do {
 				var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
 				var [playerX, playerY] = currentLevel.MAP.tileToCoords(x,y);
 				player.position.set(playerX,playerY,0);
-				
-				if(!!currentLevel.MAP.getPath(x,y,destX,destY).length) choosing = false;
-			}
+			} while (!currentLevel.MAP.getPath(x,y,destX,destY).length);
+			break;
+		
+		case (tileStates.SPEEDBOOST):
+			var t = clock.getElapsedTime();
+			currentLevel.speedStopTime = t + 5;
 			break;
 	}
 	if (gameItem.name != tileStates.WALL) {
@@ -173,7 +175,7 @@ var gameOver = false;
 
 setInterval(function() {
 	//short circuit check: is the game over?
-	if (gameOver) {
+	if (gameOver || immune) {
 		camera.position.z -= camera.position.z / 2500; 
 	} else {
 		//first, where am I at?
@@ -225,6 +227,13 @@ setInterval(function() {
 				
 			}
 		});
+		
+		//Check if the player still has a speed boost effect
+		if (currentLevel.speedStopTime < t) {
+			currentLevel.speedMultiplier = 1;
+		} else {
+			currentLevel.speedMultiplier = 2;
+		}
 	}
 	renderer.render(scene, camera);
 },1000/60);
