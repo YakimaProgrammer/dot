@@ -193,7 +193,7 @@ function newPhase() {
     cube.position.set(0,0,size*signZ);
     origin.add(cube);
   } 
-  origin.name = tileStates.PHASE;
+  origin.name = tileStates.PHASER;
   return origin;
 }
 

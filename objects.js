@@ -21,13 +21,13 @@ const settings = {
 		WALL : 0,
 		COIN : 0,
 		HEART : 3,
-		MAGNET : 5,
-		SCRABBLER : 7,
-		PHASER : 9,
+		MAGNET : 4,
+		SCRABBLER : 5,
+		PHASER : 6,
 	},
 	
 	DENSITY : {
-		WALL : 0.1,
+		WALL : 0.05,
 		COIN : 0.01,
 		HEART : 0.0005, 
 		MAGNET : 0.0005,
@@ -44,7 +44,7 @@ var currentLevel = {
 	MAP : null,
 	PLAYER : null,
 	HUNTER : null,
-	level : 5,//0,
+	level : 6,//0,
 	gameEntities : [],
 	collisions : [],
 }

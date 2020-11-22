@@ -50,19 +50,17 @@ function buildMap() {
 
 buildMap();
 
+function dispose(e) {
+	if (!!e.geometry) {
+		e.material.dispose();
+		e.geometry.dispose();
+	} else {
+		e.children.forEach(c => dispose(c));
+	}
+}
+
 function resetWorld() {
-	/* currentLevel.gameEntities.forEach(function(e) {
-		if (!!e.geometry) {
-			e.material.dispose();
-			e.geometry.dispose();
-		} else {
-			e.children.forEach(function(c) {
-				c.material.dispose();
-				c.geometry.dispose();
-			});
-		}
-		scene.remove(e)
-	}); */
+	currentLevel.gameEntities.forEach(e => dispose(e));
 	currentLevel.gameEntities.forEach(e => scene.remove(e));
 	currentLevel.gameEntities.length = 0;
 	
@@ -138,9 +136,20 @@ function onCollision(gameItem) {
 					}
 				}
 			});
+			break;
 		
+		case (tileStates.SCRABBLER):
+			var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
+			var [destX, destY] = currentLevel.MAP.tileToCoords(x,y);
+			hunter.position.set(destX,destY,0);
+			break;
+			
+		case (tileStates.PHASER):
+			var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
+			var [destX, destY] = currentLevel.MAP.tileToCoords(x,y);
+			player.position.set(destX,destY,0);
+			break;
 	}
-	
 	if (gameItem.name != tileStates.WALL) {
 		scene.remove(gameItem); //hide the item
 		gameItem.position.set(-50,-50,0); //move the item outside of the map so I don't keep hitting it
