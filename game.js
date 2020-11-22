@@ -99,11 +99,14 @@ function onCollision(gameItem) {
 		case (tileStates.HEART):
 			if (lives > 2) {
 				remove = false;
-				ghostifyEntitiy(gameItem);
-				setTimeout(function() {
-					scene.remove(gameItem);
-					gameItem.position.set(-50,-50,0);
-				},500);
+				if (!gameItem.KILLED) {
+					gameItem.KILLED = true;
+					ghostifyEntitiy(gameItem);
+					setTimeout(function() {
+						scene.remove(gameItem);
+						gameItem.position.set(-50,-50,0);
+					},500);
+				}
 			} else {
 				lives += 1;
 				livesholder.innerText = lives;
