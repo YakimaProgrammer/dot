@@ -10,7 +10,8 @@ const tileStates = {
 	LEVELUP : 5,
 	PHASER : 6,
 	SCRABBLER : 7,
-	HUNTER : 8
+	HUNTER : 8,
+	SPEEDBOOST : 9
 }
 
 const settings = {
@@ -21,18 +22,20 @@ const settings = {
 		WALL : 0,
 		COIN : 0,
 		HEART : 3,
-		MAGNET : 5,
-		SCRABBLER : 7,
-		PHASER : 9,
+		MAGNET : 4,
+		SPEEDBOOST: 4,
+		SCRABBLER : 5,
+		PHASER : 6,
 	},
 	
 	DENSITY : {
-		WALL : 0.1,
+		WALL : 0.05,
 		COIN : 0.01,
-		HEART : 0.01, 
-		MAGNET : 0.0005,
-		SCRABBLER : 0.0005,
-		PHASER : 0.0005,
+		HEART : 0.00025,
+		SPEEDBOOST : 0.00025,		
+		MAGNET : 0.0003,
+		SCRABBLER : 0.0002,
+		PHASER : 0.0002,
 	},
 	
     CUBESCALEDOWN : 2,
@@ -47,6 +50,8 @@ var currentLevel = {
 	level : 0,
 	gameEntities : [],
 	collisions : [],
+	speedMultiplier : 1,
+	speedStopTime : 0
 }
 
 Object.freeze(tileStates);
@@ -71,6 +76,10 @@ class mapClass {
 		this.heightY = Math.floor(innerHeight / settings.TILEWIDTH);
 		
 		this.tiles = twoDarray(this.widthX, this.heightY, tileStates.EMPTY);
+		
+		this.tiles[0].fill(tileStates.WALL);
+		this.tiles[this.tiles.length - 1].fill(tileStates.WALL);
+		this.tiles.forEach(function(row){row[0] = tileStates.WALL; row[row.length - 1] = tileStates.WALL});
 		
 		this.numTiles = this.widthX * this.heightY;
 		
@@ -158,15 +167,15 @@ class mapClass {
 	
 	tileToCoords(x,y) {
 		return [
-		x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
-		y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
+			x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
+			y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
 		]
 	}
 	
 	coordsToTile(x,y) {
 		return [
-		Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
-		Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
+			Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
+			Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
 		]
 	}
 }

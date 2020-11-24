@@ -7,7 +7,8 @@ const colors = {
   YELLOW : 0xffff21,
   GREEN : 0x30c702,
   BLUE : 0x0335ff,
-  BLACK : 0x000000
+  BLACK : 0x000000,
+  REDGAMEOVER : 0xff4747
 };
 
 function newMagnet() {
@@ -192,7 +193,7 @@ function newPhase() {
     cube.position.set(0,0,size*signZ);
     origin.add(cube);
   } 
-  origin.name = tileStates.PHASE;
+  origin.name = tileStates.PHASER;
   return origin;
 }
 
@@ -279,6 +280,7 @@ const tileStateToGameItem = {
 	[tileStates.EMPTY] : function(){},
 	[tileStates.WALL] : newWall,
 	[tileStates.COIN] : newCoin,
+	[tileStates.SPEEDBOOST] : newSpeedBoost,
 	[tileStates.MAGNET] : newCoinMagnet,
 	[tileStates.HEART] : newHeart,
 	[tileStates.LEVELUP] : newLevelUp,

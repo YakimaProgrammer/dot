@@ -4,18 +4,29 @@ var scene = new THREE.Scene();
 // This is what sees the stuff:
 var aspect_ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(75, aspect_ratio, 1, 10000);
-camera.position.z = 250;
-player.add(camera);
 
-//camera.position.set(window.innerWidth / 2,window.innerHeight / 2,500);
-//scene.add(camera);
+var cameraZ;
+
+camera.setpositionone = function() {
+	cameraZ = 250;
+	camera.position.set(0,0,cameraZ);
+	player.add(camera);
+}
+
+camera.setpositiontwo = function() {
+	cameraZ = 500;
+	camera.position.set(window.innerWidth / 2,window.innerHeight / 2,cameraZ);
+	scene.add(camera);
+}
+
+camera.setpositionone();
+var cameraposition = 1;
 
 // This will draw what the camera sees onto the screen:
 
 renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-document.body.style.overflow = "hidden"; //I don't love this solution, but I can't get my computer to stop reading the total screen width/height instead of the actual width/height
 
 // ******** START CODING ON THE NEXT LINE ********
 function buildMap() {
@@ -30,40 +41,7 @@ function buildMap() {
 			}
 		}
 	}
-	
-	//Now create the bounding box
-	
-	//x
-	var wall;
-	for (var i = 0; i < map.tiles[0].length; i++) {
-		wall = newWall();
-		var [x, y] = map.tileToCoords(0,i);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
 		
-		wall = newWall();
-		var [x, y] = map.tileToCoords(map.tiles.length,i);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-	}
-	
-	//y
-	for (var i = 0; i < map.tiles.length+1; i++) {
-		wall = newWall();
-		var [x, y] = map.tileToCoords(i,0);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-		
-		wall = newWall();
-		var [x, y] = map.tileToCoords(i,map.tiles[0].length);
-		wall.position.set(x,y,0);
-		wall.name = tileStates.WALL;
-		currentLevel.gameEntities.push(wall);
-	}
-	
 	//add the player
 	var [playerX, playerY] = map.tileToCoords(map.playerX, map.playerY);
 	player.position.set(playerX,playerY,0);
@@ -77,6 +55,23 @@ function buildMap() {
 
 buildMap();
 
+function dispose(e) {
+	if (!!e.geometry) {
+		e.material.dispose();
+		e.geometry.dispose();
+	} else {
+		e.children.forEach(c => dispose(c));
+	}
+}
+
+function resetWorld() {
+	currentLevel.gameEntities.forEach(e => dispose(e));
+	currentLevel.gameEntities.forEach(e => scene.remove(e));
+	currentLevel.gameEntities.length = 0;
+	
+	buildMap();
+}
+
 scene.add(hunter);
 scene.add(player);
 
@@ -86,19 +81,45 @@ function squareCollide(shapeA, shapeB) {
 	return boxA.intersectsBox(boxB);
 }
 
-var score = 0;
+var score = 0 
+var lives = 1;
+var immune = false;
 var scoreholder = document.getElementById("scoreholder");
+var livesholder = document.getElementById("livesholder");
+var levelsholder = document.getElementById("levelholder");
 
 function onCollision(gameItem) {
+	var remove = true;
 	switch (gameItem.name) {
 		case (tileStates.COIN):
 			score += 1;
 			scoreholder.innerText = score; 
 			break;
-		case (tileStates.LEVELUP):
-			currentLevel.level++;
-			buildMap();
+		
+		case (tileStates.HEART):
+			if (lives > 2) {
+				remove = false;
+				if (!gameItem.KILLED) {
+					gameItem.KILLED = true;
+					ghostifyEntitiy(gameItem);
+					setTimeout(function() {
+						scene.remove(gameItem);
+						gameItem.position.set(-50,-50,0);
+					},500);
+				}
+			} else {
+				lives += 1;
+				livesholder.innerText = lives;
+			}
 			break;
+			
+		case (tileStates.LEVELUP):
+			rebuildWorldAnimation(colors.GREEN,function() {
+				currentLevel.level++;
+				levelsholder.innerText = currentLevel.level + 1;
+			},1000);
+			break;
+			
 		case (tileStates.WALL):
 			player.position.copy(playerPositionBeforeUpdate);
 			
@@ -123,9 +144,41 @@ function onCollision(gameItem) {
 				player.position.y -= 0.5;
 			}
 			break;
+		
+		case (tileStates.MAGNET):
+			var [targetX, targetY] = currentLevel.MAP.coordsToTile(gameItem.position.x,gameItem.position.y);
+			currentLevel.gameEntities.forEach(function(e) {
+				if (e.name == tileStates.COIN) {
+					var [startX, startY] = currentLevel.MAP.coordsToTile(e.position.x,e.position.y);
+					if (Math.abs(startX) == startX) { //don't try to pathfind already claimed coins
+						e.PATH = currentLevel.MAP.getPath(startX,startY,targetX,targetY);
+					}
+				}
+			});
+			break;
+		
+		case (tileStates.SCRABBLER): //I specifically do not check if the destination location can reach the player because there should be a chance that striking one of these powerups will lock the hunter far away, then it becomes a challenge not to collect a SCRABBLER
+			var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
+			var [destX, destY] = currentLevel.MAP.tileToCoords(x,y);
+			hunter.position.set(destX,destY,0);
+			break;
+			
+		case (tileStates.PHASER): //I do check whether the end position is valid, otherwise the player can not play the game.
+			var levelup = currentLevel.gameEntities.filter(e => e.name == tileStates.LEVELUP)[0];
+			var [destX,destY] = currentLevel.MAP.coordsToTile(levelup.position.x,levelup.position.y);
+			do {
+				var [x,y] = currentLevel.MAP.getRandomAvailablePoint();
+				var [playerX, playerY] = currentLevel.MAP.tileToCoords(x,y);
+				player.position.set(playerX,playerY,0);
+			} while (!currentLevel.MAP.getPath(x,y,destX,destY).length);
+			break;
+		
+		case (tileStates.SPEEDBOOST):
+			var t = clock.getElapsedTime();
+			currentLevel.speedStopTime = t + 5;
+			break;
 	}
-	
-	if (gameItem.name != tileStates.WALL) {
+	if ((gameItem.name != tileStates.WALL) && remove) {
 		scene.remove(gameItem); //hide the item
 		gameItem.position.set(-50,-50,0); //move the item outside of the map so I don't keep hitting it
 	}
@@ -135,12 +188,26 @@ function onCollision(gameItem) {
 
 var clock = new THREE.Clock();
 var playerPositionBeforeUpdate;
-var gameOver = false;
+var gamePaused = false;
+
+function rebuildWorldAnimation(color,callback,time=2500) {
+	gamePaused = true;
+	currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
+	if (color) scene.background = new THREE.Color(color);
+	setTimeout(function() {
+		if (callback) callback();
+		resetWorld();
+		scene.background = null;
+		gamePaused = false;
+		immune = false;
+		camera.position.z = cameraZ;
+		speedIn = [0,0,0,0]; //Stop all of my motion
+	},time);
+}
 
 
 setInterval(function() {
-	//short cuircut check: is the game over?
-	if (gameOver) {
+	if (gamePaused) {
 		camera.position.z -= camera.position.z / 2500; 
 	} else {
 		//first, where am I at?
@@ -156,12 +223,26 @@ setInterval(function() {
 
 		//Now, check if I am colliding with the DEATHAURA
 		if (squareCollide(deathAura,player)) {
-			currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
-			//ghostifyEntitiy(player);
-			ghostifyEntitiy(hunter);
-			ghostifyEntitiy(deathAura);
-			
-			gameOver = true;
+			if (!immune) {
+				lives -= 1;
+				livesholder.innerText = lives; 
+				immune = true;
+				currentLevel.gameEntities.forEach(e => ghostifyEntitiy(e));
+				if (lives > 0) {
+					rebuildWorldAnimation();
+				} else {
+					rebuildWorldAnimation(colors.REDGAMEOVER, function() {
+						lives = 1;
+						score = 0;
+						currentLevel.level = 0;
+						
+						levelsholder.innerText = 1;
+						livesholder.innerText = 1;
+						scoreholder.innerText = 0;
+					});
+					
+				}
+			}
 		}
 		
 		//Now, rotate all coins, power ups
@@ -171,6 +252,23 @@ setInterval(function() {
 				e.rotation.set(t,t*2,0);
 			}
 		});
+		
+		//If any coins need to be moved, move them
+		currentLevel.gameEntities.forEach(function(e) {
+			if (!!e.PATH && !!e.PATH.length) {
+				var [oldX,oldY] = e.PATH.shift();
+				var [newX,newY] = currentLevel.MAP.tileToCoords(oldX,oldY);
+				e.position.set(newX,newY,0);
+				
+			}
+		});
+		
+		//Check if the player still has a speed boost effect
+		if (currentLevel.speedStopTime < t) {
+			currentLevel.speedMultiplier = 1;
+		} else {
+			currentLevel.speedMultiplier = 2;
+		}
 	}
 	renderer.render(scene, camera);
 },1000/60);

@@ -1,27 +1,38 @@
 var movingIn = [false,false,false,false];
 var speedIn = [0,0,0,0];
+
 document.addEventListener("keydown", function(event) {
-switch (event.key) {
-  case 'w':
-  case 'ArrowUp':
-	movingIn[0] = true;
-	break;
-	
-  case 'a':
-  case 'ArrowLeft':
-	movingIn[1] = true;
-	break;
-	
-  case 's':
-  case 'ArrowDown':
-	movingIn[2] = true;
-	break;
-	
-  case 'd':
-  case 'ArrowRight':
-	movingIn[3] = true;
-	break;
-}
+	switch (event.key) {
+	  case 'w':
+	  case 'ArrowUp':
+		movingIn[0] = true;
+		break;
+		
+	  case 'a':
+	  case 'ArrowLeft':
+		movingIn[1] = true;
+		break;
+		
+	  case 's':
+	  case 'ArrowDown':
+		movingIn[2] = true;
+		break;
+		
+	  case 'd':
+	  case 'ArrowRight':
+		movingIn[3] = true;
+		break;
+		
+	  case 'c':
+		cameraposition = (cameraposition + 1) % 2;
+		if (!cameraposition) {camera.setpositiontwo()}
+		else {camera.setpositionone()}
+		break;
+	  
+	  case 'Escape':
+		gamePaused = !gamePaused;
+		camera.position.z = cameraZ;
+	}
 });
 
 document.addEventListener("keyup", function(event) {
@@ -58,6 +69,6 @@ function calculateSpeed(currentSpeed, increasing) {
 
 function movePlayer() {
   speedIn = movingIn.map((increasing, index) => calculateSpeed(speedIn[index],increasing));
-  player.position.x += (speedIn[3] - speedIn[1]) / 5;
-  player.position.y += (speedIn[0] - speedIn[2]) / 5;
+  player.position.x += currentLevel.speedMultiplier * (speedIn[3] - speedIn[1]) / 5;
+  player.position.y += currentLevel.speedMultiplier * (speedIn[0] - speedIn[2]) / 5;
 }
