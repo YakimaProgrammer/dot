@@ -9,7 +9,9 @@ const tileStates = {
 	HEART : 4,
 	LEVELUP : 5,
 	PHASER : 6,
-	SCRABBLER : 7
+	SCRABBLER : 7,
+	HUNTER : 8,
+	SPEEDBOOST : 9
 }
 
 const settings = {
@@ -20,22 +22,25 @@ const settings = {
 		WALL : 0,
 		COIN : 0,
 		HEART : 3,
-		MAGNET : 5,
-		SCRABBLER : 7,
-		PHASER : 9,
+		MAGNET : 4,
+		SPEEDBOOST: 4,
+		SCRABBLER : 5,
+		PHASER : 6,
 	},
 	
 	DENSITY : {
-		WALL : 0.1,
+		WALL : 0.05,
 		COIN : 0.01,
-		HEART : 0.01, 
-		MAGNET : 0.0005,
-		SCRABBLER : 0.0005,
-		PHASER : 0.0005,
+		HEART : 0.00025,
+		SPEEDBOOST : 0.00025,		
+		MAGNET : 0.0003,
+		SCRABBLER : 0.0002,
+		PHASER : 0.0002,
 	},
 	
     CUBESCALEDOWN : 2,
 	TILEWIDTH : 16,
+	HUNTERSPEED : 0.75
 }
 
 var currentLevel = {
@@ -45,6 +50,8 @@ var currentLevel = {
 	level : 0,
 	gameEntities : [],
 	collisions : [],
+	speedMultiplier : 1,
+	speedStopTime : 0
 }
 
 Object.freeze(tileStates);
@@ -58,6 +65,8 @@ function twoDarray(x, y, fill) {
 	return dx;
 }
 
+transpose = m => m[0].map((x,i) => m.map(x => x[i])); //transpose an array
+
 var finder = new PF.AStarFinder();
 
 class mapClass {
@@ -67,6 +76,10 @@ class mapClass {
 		this.heightY = Math.floor(innerHeight / settings.TILEWIDTH);
 		
 		this.tiles = twoDarray(this.widthX, this.heightY, tileStates.EMPTY);
+		
+		this.tiles[0].fill(tileStates.WALL);
+		this.tiles[this.tiles.length - 1].fill(tileStates.WALL);
+		this.tiles.forEach(function(row){row[0] = tileStates.WALL; row[row.length - 1] = tileStates.WALL});
 		
 		this.numTiles = this.widthX * this.heightY;
 		
@@ -81,6 +94,14 @@ class mapClass {
 			}
 		}
 		
+		this.asArray = transpose(
+			this.tiles.map(function(secondaryArray) {
+				return secondaryArray.map(function(item) {
+					return item == tileStates.WALL ? 1 : 0;
+				});
+			})
+		); //I need to transpose the array otherwise pathfinding does not work in the right most third of the map (depending on screen resolution);
+				
 		var playerX, playerY, hunterX, hunterY, levelUpX, levelUpY;
 		var stillSpawning = true;
 		
@@ -92,27 +113,25 @@ class mapClass {
 			//Double check that the player and the hunter are not too close
 			if (((playerX - hunterX) ** 2 + (playerY - hunterY) ** 2) < 5) {
 				continue; //force next loop now
-			} 
+			}
+
+			if (((playerX - levelUpX) ** 2 + (playerY - levelUpY) ** 2) < 5) {
+				continue; //force next loop now
+			}
 			
 			//Now make sure that they can reach each other
-			if (!this.getPath(playerX, playerY, hunterX, hunterY)) {
+			if (!this.getPath(playerX, playerY, hunterX, hunterY).length) {
 				continue;
 			}
 			
 			//and that the player can level up
-			if (!this.getPath(playerX, playerY, levelUpX, levelUpY)) {
+			if (!this.getPath(playerX, playerY, levelUpX, levelUpY).length) {
 				continue;
 			}
 			
-			stillSpawning = false;
+			stillSpawning = false; //break out of loop
 		}
 
-		this.asArray = this.tiles.map(function(secondaryArray) {
-			return secondaryArray.map(function(item) {
-				return item == tileStates.WALL ? 1 : 0;
-			});
-		});
-		
 		this.playerX = playerX;
 		this.playerY = playerY;
 		this.hunterX = hunterX;
@@ -143,20 +162,20 @@ class mapClass {
 	}
 	
 	getPath(x1,y1,x2,y2) {
-		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.widthX, this.heightY, this.asArray));
+		return finder.findPath(x1, y1, x2, y2, new PF.Grid(this.asArray));
 	}
 	
 	tileToCoords(x,y) {
 		return [
-		x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
-		y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
+			x * settings.TILEWIDTH - (settings.TILEWIDTH / 2),
+			y * settings.TILEWIDTH - (settings.TILEWIDTH / 2)
 		]
 	}
 	
 	coordsToTile(x,y) {
 		return [
-		Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
-		Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
+			Math.floor((x + settings.TILEWIDTH) / settings.TILEWIDTH),
+			Math.floor((y + settings.TILEWIDTH) / settings.TILEWIDTH)
 		]
 	}
 }
