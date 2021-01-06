@@ -62,11 +62,12 @@ function dispose(e) {
 	} else {
 		e.children.forEach(c => dispose(c));
 	}
+	
+	scene.remove(e)
 }
 
 function resetWorld() {
 	currentLevel.gameEntities.forEach(e => dispose(e));
-	currentLevel.gameEntities.forEach(e => scene.remove(e));
 	currentLevel.gameEntities.length = 0;
 	
 	buildMap();
@@ -205,6 +206,18 @@ function rebuildWorldAnimation(color,callback,time=2500) {
 	},time);
 }
 
+function hideOutOfViewObjects() {
+	var frustum = new THREE.Frustum();
+	var cameraViewProjectionMatrix = new THREE.Matrix4();
+
+	camera.updateMatrixWorld();
+	cameraViewProjectionMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+	frustum.setFromProjectionMatrix(cameraViewProjectionMatrix);
+	debugger;
+	currentLevel.gameEntities.forEach(function(e) {
+		e.visible = frustum.intersectsBox(new THREE.Box3().setFromObject(e)) //my visibility is determined by whether or not you can see me!
+	});
+}
 
 setInterval(function() {
 	if (gamePaused) {
@@ -269,6 +282,9 @@ setInterval(function() {
 		} else {
 			currentLevel.speedMultiplier = 2;
 		}
+		
+		//Hide non-visible objects
+		//hideOutOfViewObjects();
 	}
 	renderer.render(scene, camera);
 },1000/60);
