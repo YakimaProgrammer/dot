@@ -59,6 +59,7 @@ function dispose(e) {
 	if (!!e.geometry) {
 		e.material.dispose();
 		e.geometry.dispose();
+		scene.remove(e);
 	} else {
 		e.children.forEach(c => dispose(c));
 	}
@@ -66,7 +67,6 @@ function dispose(e) {
 
 function resetWorld() {
 	currentLevel.gameEntities.forEach(e => dispose(e));
-	currentLevel.gameEntities.forEach(e => scene.remove(e));
 	currentLevel.gameEntities.length = 0;
 	
 	buildMap();
