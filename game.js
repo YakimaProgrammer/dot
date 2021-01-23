@@ -59,14 +59,16 @@ function dispose(e) {
 	if (!!e.geometry) {
 		e.material.dispose();
 		e.geometry.dispose();
-		scene.remove(e);
 	} else {
 		e.children.forEach(c => dispose(c));
 	}
 }
 
 function resetWorld() {
-	currentLevel.gameEntities.forEach(e => dispose(e));
+	currentLevel.gameEntities.forEach(function(e) {
+		dispose(e);
+		scene.remove(e);
+	});
 	currentLevel.gameEntities.length = 0;
 	
 	buildMap();
@@ -270,9 +272,13 @@ setInterval(function() {
 			currentLevel.speedMultiplier = 2;
 		}
 	}
-	renderer.render(scene, camera);
 },1000/60);
-
 
 // Now, show what the camera sees on the screen:
 renderer.render(scene, camera);
+
+function animate() {
+	requestAnimationFrame(animate)
+	renderer.render(scene, camera);
+}
+requestAnimationFrame(animate);

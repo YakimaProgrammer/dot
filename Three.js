@@ -1,3 +1,4 @@
+// https://github.com/mrdoob/three.js
 // threejs.org/license
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
