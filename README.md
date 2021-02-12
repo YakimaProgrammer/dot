@@ -1,2 +1,2 @@
-This is a Three.js project that resembles Pac-Man, but offers additional power ups and only a single pursuer. Use the WASD or arrow keys to move, C to change camera angles and escape to pause. Download your own copy or get started right away at magnusfulton.com/dot  
-I have chosen to include the nessisary dependencies (Pathfinding.js and Three.js) directly in this repository. Obviously, those files are owned and bound by the copyright of their respective owners.
+This is a Three.js project that resembles Pac-Man, but offers additional power ups and only a single pursuer. Use the WASD or arrow keys to move, C to change camera angles and escape to pause. Download your own copy or get started right away at magnusfulton.com/dot
+I have chosen to include the necessary dependencies (Pathfinding.js and Three.js) directly in this repository. Obviously, those files are owned and bound by the copyright of their respective owners.
