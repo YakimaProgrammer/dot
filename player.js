@@ -145,5 +145,8 @@ function getAccel(){
 try {
     getAccel();
 } catch {
-    //Do nothing, iOS accelerometer not available
+    //Should might work for Android devices
+    if (!!window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", accelerometer);
+    }
 }
