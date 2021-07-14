@@ -285,3 +285,7 @@ function animate() {
 	renderer.render(scene, camera);
 }
 requestAnimationFrame(animate);
+
+if (window.innerHeight > window.innerWidth) {
+    document.getElementById("scoreboard").classList.add("asLandscape");
+}

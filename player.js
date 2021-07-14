@@ -91,6 +91,10 @@ function movePlayer() {
 
 function accelerometer(e) {
     if (!anyKeyPressed) {
+        if (!localStorage.getItem("hasPlayedBefore")) {
+            alert("This game is best played with portrait orientation lock on, but with the device in the landscape orientation.");
+            localStorage.setItem("hasPlayedBefore",true);
+        }
         //x,y,z from the accelerometer's reference point, not mine
         var y = e.beta || e.y || e.acceleration.y;
         var z = e.gamma || e.z || e.acceleration.z;
@@ -139,7 +143,6 @@ function getAccel(){
             window.addEventListener("MozOrientation", accelerometer);
             window.addEventListener("devicemotion", accelerometer);
         }
-        tiltExplination.style.display = "none";
     });
 }
 try {
