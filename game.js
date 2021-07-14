@@ -207,11 +207,14 @@ function rebuildWorldAnimation(color,callback,time=2500) {
 	},time);
 }
 
+var gamePausedOverlay = document.getElementById("gamePaused");
 
 setInterval(function() {
 	if (gamePaused) {
 		camera.position.z -= camera.position.z / 2500; 
+        camera.position.z = Math.max(camera.position.z, 150);
 	} else {
+        gamePausedOverlay.style.display = "none";
 		//first, where am I at?
 		playerPositionBeforeUpdate = player.position.clone(); 
 		//now, move the player
@@ -224,7 +227,7 @@ setInterval(function() {
 		updateHunter(); //Pathfinding is updated in another loop
 
 		//Now, check if I am colliding with the DEATHAURA
-		if (squareCollide(deathAura,player)) {
+		if (squareCollide(hunter,player)) {
 			if (!immune) {
 				lives -= 1;
 				livesholder.innerText = lives; 
