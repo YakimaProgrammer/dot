@@ -15,9 +15,10 @@
 		<script type="text/javascript" src="game.js" defer></script>
 		
 		<style>
-		.scoreboard {
+		#scoreboard {
 			position: absolute;
 			display: inline; 
+            padding: 10px;
 		}
 		
 		h1 {
@@ -29,13 +30,23 @@
 			margin: 0;
 			overflow: hidden;
 		}
+        
+        #gamePaused {
+            color: red;
+            display: none;
+        }
+        
+        .asLandscape {
+            transform: rotate(-90deg);
+        }
 		</style>
 	</head>
 	<body>
-		<div class="scoreboard">
+		<div id="scoreboard">
 			<h1>Level: <span id="levelholder">1</span></h1>
 			<h1>Lives: <span id="livesholder">1</span></h1>
 			<h1>Score: <span id="scoreholder">0</span></h1>
+            <h1 id="gamePaused">Paused!</h1>
 		</div>
 	</body>
 </html>

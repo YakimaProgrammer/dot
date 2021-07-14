@@ -1,8 +1,11 @@
-var hunter = new THREE.Mesh(new THREE.CubeGeometry(SIZE*2,SIZE*2,SIZE*2), new THREE.MeshBasicMaterial({color : colors.RED}));
+var hunter = new THREE.Mesh(new THREE.CubeGeometry(settings.TILEWIDTH,settings.TILEWIDTH,settings.TILEWIDTH), new THREE.MeshBasicMaterial({color : colors.RED}));
+//var hunter = new THREE.Mesh(new THREE.CubeGeometry(SIZE*2,SIZE*2,SIZE*2), new THREE.MeshBasicMaterial({color : colors.RED}));
 
-var deathAura = new THREE.Mesh(new THREE.CubeGeometry(SIZE*9,SIZE*9,SIZE/2), new THREE.MeshBasicMaterial({color : colors.BLACK}));
-deathAura.name = tileStates.HUNTER;
-hunter.add(deathAura);
+//var deathAura = new THREE.Mesh(new THREE.CubeGeometry(SIZE*9,SIZE*9,SIZE/2), new THREE.MeshBasicMaterial({color : colors.BLACK}));
+//deathAura.name = tileStates.HUNTER;
+//hunter.add(deathAura);
+hunter.name = tileStates.HUNTER;
+
 
 var hunterSpeedIn = [0,0];
 
